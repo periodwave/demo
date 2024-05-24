@@ -1,0 +1,780 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>PeriodWave: Multi-Period Flow Matching for High-Fidelity Waveform Generation</title>
+    <style>
+        red {color: red}
+        audio {width: 250px}
+    </style>
+</head>
+
+<body>
+    <article>
+      <header>
+        <h1>PeriodWave: Multi-Period Flow Matching for High-Fidelity Waveform Generation</h1>
+      </header>
+    </article> 
+ 
+    <div>
+    <h2>Abstract</h2> 
+    <p> Recently, universal waveform generation tasks have been investigated conditioned on various out-of-distribution scenarios. 
+        Although GAN-based methods have shown their strength in fast waveform generation, they are vulnerable to train-inference mismatch scenarios such as two-stage text-to-speech. 
+        Meanwhile, diffusion-based models have shown their powerful generative performance in other domains; 
+        however, they stay out of the limelight due to slow inference speed in waveform generation tasks. 
+        Above all, there is no generator architecture that can explicitly disentangle the natural periodic features of high-resolution waveform signals. 
+        In this paper, we propose PeriodWave, a novel universal waveform generation model. 
+        First, we introduce a period-aware flow matching estimator that can capture the periodic features of the waveform signal when estimating the vector fields. 
+        Additionally, we utilize a multi-period estimator that avoids overlaps to capture different periodic features of waveform signals. 
+        Although increasing the number of periods can improve the performance significantly, this requires more computational costs. 
+        To reduce this issue, we also propose a single period-conditional universal estimator that can feed-forward parallel by period-wise batch inference. 
+        Additionally, we utilize discrete wavelet transform to losslessly disentangle the frequency information of waveform signals for high-frequency modeling. 
+        The experimental results demonstrated that our model outperforms the previous models both in Mel-spectrogram reconstruction and text-to-speech tasks. 
+    </p>
+    </div> 
+ 
+    <h2><p class="toc_title">Contents</p></h2>
+    <div id="toc_container">
+    <ul>
+        <li><a href="#ms">Multi Speaker (LibriTTS dataset)</a></li>
+        <li><a href="#ss">Single Speakers (LJ Speech dataset) </a></li>
+        <li><a href="#tts">LJ Speech TTS (Glow TTS + vocoder) </a></li>
+        <li><a href="#ood1">Out-of-Domain (MUSDB18HQ dataset) - Bass </a></li>
+        <li><a href="#ood2">Out-of-Domain (MUSDB18HQ dataset) - Drums </a></li>
+        <li><a href="#ood3">Out-of-Domain (MUSDB18HQ dataset) - Mixture </a></li>
+        <li><a href="#ood4">Out-of-Domain (MUSDB18HQ dataset) - Other </a></li>
+        <li><a href="#ood5">Out-of-Domain (MUSDB18HQ dataset) - Vocals </a></li>
+
+    </ul>
+    </div>
+
+    <p>&nbsp;</p>
+    <div>
+    <a name="ms"><h2>Multi Speaker (LibriTTS dataset)</h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td>  
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/1089_134686_000009_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/gt/7729_102255_000003_000004.wav"></audio></td>
+        </tr>
+       
+        <tr>
+            <td nowrap width="160">UnivNet</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/1089_134686_000009_000000.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/univnet/7729_102255_000003_000004.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160">Vocos</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/1089_134686_000009_000000.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/vocos/7729_102255_000003_000004.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/1089_134686_000009_000000.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_base/7729_102255_000003_000004.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/1089_134686_000009_000000.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/bigvgan_large/7729_102255_000003_000004.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/1089_134686_000009_000000.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/7729_102255_000003_000004.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/1089_134686_000009_000000.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/7729_102255_000003_000004.wav"></audio></td>
+        </tr> 
+    </tbody>
+    </table>
+    </div>  
+    <br><br> 
+
+    <div>
+    <a name="ss"><h2>Single Speakers (LJ Speech dataset)</h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/gt/LJ050-0277.wav"></audio></td>
+        </tr>
+           
+        <tr>
+            <td nowrap width="160">HiFi-GAN</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/hifi/LJ050-0277.wav"></audio></td>
+        </tr>
+    
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_base/LJ050-0277.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/bigvgan_large/LJ050-0277.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160">PriorGrad</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/priorgrad/LJ050-0277.wav"></audio></td>
+        </tr>
+
+        <tr>
+            <td nowrap width="160">FreGrad</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/fregrad/LJ050-0277.wav"></audio></td>
+        </tr>
+    
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ050-0277.wav"></audio></td>
+        </tr> 
+
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mbgt/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ050-0277.wav"></audio></td>
+        </tr> 
+    </tbody>
+    </table>
+    </div>
+    <br><br> 
+    
+    
+    <div>
+    <a name="tts"><h2>LJ Speech TTS (Glow TTS + vocoder) </h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ049-0031.wav"></audio></td> 
+        </tr>
+        
+        <tr>
+            <td nowrap width="160">HiFi-GAN</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/hifi/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/hifi/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/hifi/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/hifi/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/hifi/LJ049-0031.wav"></audio></td> 
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_base/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_base/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_base/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_base/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_base/LJ049-0031.wav"></audio></td> 
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_large/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_large/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_large/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_large/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/bigvgan_large/LJ049-0031.wav"></audio></td> 
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>PriorGrad</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/priorgrad/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/priorgrad/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/priorgrad/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/priorgrad/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/priorgrad/LJ049-0031.wav"></audio></td> 
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>FreGrad</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/fregrad/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/fregrad/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/fregrad/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/fregrad/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/fregrad/LJ049-0031.wav"></audio></td> 
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave/LJ049-0031.wav"></audio></td> 
+        </tr> 
+
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave (0.333) </b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_333/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_333/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_333/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_333/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_333/LJ049-0031.wav"></audio></td> 
+        </tr>  
+       
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave (0.5) </b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_5/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_5/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_5/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_5/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_5/LJ049-0031.wav"></audio></td> 
+        </tr> 
+
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave (0.667) </b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_667/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_667/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_667/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_667/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_667/LJ049-0031.wav"></audio></td> 
+        </tr> 
+
+    </tbody>
+    </table>
+    </div>  
+    <br><br> 
+
+    <div>
+    <a name="ood1"><h2> Out-Of-Distrubution: MUSDB18-HQ (Bass) </h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">UnivNet</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">Vocos</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>
+        
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>  
+    </tbody>
+    </table>
+    </div>  
+    <br><br> 
+      
+    <div>
+    <a name="ood2"><h2> Out-Of-Distrubution: MUSDB18-HQ (Drums) </h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">UnivNet</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">Vocos</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>
+        
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>  
+    </tbody>
+    </table>
+    </div>  
+    <br><br> 
+
+    <div>
+    <a name="ood3"><h2> Out-Of-Distrubution: MUSDB18-HQ (Mixture) </h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">UnivNet</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">Vocos</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>
+        
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>
+
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>  
+    </tbody>
+    </table>
+    </div>  
+    <br><br> 
+
+    <div>
+    <a name="ood4"><h2> Out-Of-Distrubution: MUSDB18-HQ (others) </h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160">UnivNet</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160">Vocos</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>
+        
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>  
+    </tbody>
+    </table>
+    </div>  
+    <br><br> 
+
+    <div>
+    <a name="ood5"><h2> Out-Of-Distrubution: MUSDB18-HQ (Vocals) </h2></a>
+    <hr>
+    <table>
+    <tbody>
+        <tr>
+            <td nowrap width="160">Ground Truth</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/gt/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160">UnivNet</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/univnet/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160">Vocos</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/vocos/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160">BigVGAN-base</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_base/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>
+        
+        <tr>
+            <td nowrap width="160">BigVGAN-large</td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/bigvgan_large/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160"><b>PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>
+    
+        <tr>
+            <td nowrap width="160"><b>MB-PeriodWave</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>  
+    </tbody>
+    </table>
+    </div>  
+    <br><br> 
+
+
+  </body>
+</html>

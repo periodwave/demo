@@ -19,7 +19,7 @@
     </article> 
  
     <div>
-    <h2>Abstract</h2> 
+    <h3>Abstract</h3> 
     <p> Recently, universal waveform generation tasks have been investigated conditioned on various out-of-distribution scenarios. 
         Although GAN-based methods have shown their strength in fast waveform generation, they are vulnerable to train-inference mismatch scenarios such as two-stage text-to-speech. 
         Meanwhile, diffusion-based models have shown their powerful generative performance in other domains; 
@@ -35,13 +35,13 @@
     </p>
     </div> 
  
-    <h2><p class="toc_title">Contents</p></h2>
+    <h3><p class="toc_title">Contents</p></h3>
     <div id="toc_container">
     <ul>
         <li><a href="#ms">Multi Speakers (LibriTTS dataset)</a></li>
         <li><a href="#ss">Single Speaker (LJSpeech dataset) </a></li>
         <li><a href="#tts">LJSpeech TTS (Glow TTS + vocoder) </a></li>
-        <li><a href="#tts_step">LJSpeech TTS (per sampling step) </a></li>
+        <li><a href="#pw_step">LJSpeech (per sampling step) </a></li>
         <li><a href="#ood1">Out-of-Domain (MUSDB18HQ dataset) - Bass </a></li>
         <li><a href="#ood2">Out-of-Domain (MUSDB18HQ dataset) - Drums </a></li>
         <li><a href="#ood3">Out-of-Domain (MUSDB18HQ dataset) - Mixture </a></li>
@@ -383,10 +383,10 @@
 
 
     <div>
-        <a name="tts_step"><h2>LJSpeech TTS (per sampling step) </h2></a>
+        <a name="pw_step"><h2>LJSpeech (per sampling step) </h2></a>
         <hr>  
         <figure style="text-align: left;">
-            <img src="samples/tts_step/table_eval.jpg" alt="evaluation table" width="65%" height="auto"> 
+            <img src="samples/pw_step/table_eval.jpg" alt="evaluation table" width="65%" height="auto"> 
             <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
                 Objective evaluation results on LJSpeech according to different sampling steps. We utilized PeriodWave trained for 1M steps.
             </figcaption>
@@ -395,66 +395,75 @@
         <table>
         <tbody>
             <tr>
+                <td nowrap width="160">Ground Truth</td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ008-0158.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/gt/LJ049-0031.wav"></audio></td> 
+            </tr>
+
+            <tr>
                 <td nowrap width="160"><b>PeriodWave (step 1)</b></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw1/LJ006-0078.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw1/LJ008-0140.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw1/LJ008-0158.wav"></audio></td>
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw1/LJ046-0193.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw1/LJ049-0031.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw1/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw1/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw1/LJ008-0158.wav"></audio></td>
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw1/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw1/LJ049-0031.wav"></audio></td> 
             </tr>
             
             <tr>
                 <td nowrap width="160"><b>PeriodWave (step 2)</b></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw2/LJ006-0078.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw2/LJ008-0140.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw2/LJ008-0158.wav"></audio></td>
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw2/LJ046-0193.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw2/LJ049-0031.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw2/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw2/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw2/LJ008-0158.wav"></audio></td>
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw2/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw2/LJ049-0031.wav"></audio></td> 
             </tr>
     
             <tr>
                 <td nowrap width="160"><b>PeriodWave (step 4)</b></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw4/LJ006-0078.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw4/LJ008-0140.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw4/LJ008-0158.wav"></audio></td>
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw4/LJ046-0193.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw4/LJ049-0031.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw4/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw4/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw4/LJ008-0158.wav"></audio></td>
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw4/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw4/LJ049-0031.wav"></audio></td> 
             </tr>
     
             <tr>
                 <td nowrap width="160"><b>PeriodWave (step 8)</b></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw8/LJ006-0078.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw8/LJ008-0140.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw8/LJ008-0158.wav"></audio></td>
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw8/LJ046-0193.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw8/LJ049-0031.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw8/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw8/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw8/LJ008-0158.wav"></audio></td>
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw8/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw8/LJ049-0031.wav"></audio></td> 
             </tr>
     
             <tr>
                 <td nowrap width="160"><b>PeriodWave (step 16)</b></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw16/LJ006-0078.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw16/LJ008-0140.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw16/LJ008-0158.wav"></audio></td>
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw16/LJ046-0193.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw16/LJ049-0031.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw16/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw16/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw16/LJ008-0158.wav"></audio></td>
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw16/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw16/LJ049-0031.wav"></audio></td> 
             </tr>
     
             <tr>
                 <td nowrap width="160"><b>PeriodWave (step 32)</b></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw32/LJ006-0078.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw32/LJ008-0140.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw32/LJ008-0158.wav"></audio></td>
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw32/LJ046-0193.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw32/LJ049-0031.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw32/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw32/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw32/LJ008-0158.wav"></audio></td>
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw32/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw32/LJ049-0031.wav"></audio></td> 
             </tr>
     
             <tr>
                 <td nowrap width="160"><b>PeriodWave (step 64)</b></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw64/LJ006-0078.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw64/LJ008-0140.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw64/LJ008-0158.wav"></audio></td>
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw64/LJ046-0193.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_step/pw64/LJ049-0031.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw64/LJ006-0078.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw64/LJ008-0140.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw64/LJ008-0158.wav"></audio></td>
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw64/LJ046-0193.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/pw_step/pw64/LJ049-0031.wav"></audio></td> 
             </tr>  
             
     </tbody>

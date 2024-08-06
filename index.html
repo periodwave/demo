@@ -142,7 +142,19 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/7176_92135_000022_000022.wav"></audio></td>
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave/7729_102255_000003_000004.wav"></audio></td>
         </tr>
-
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/1089_134686_000009_000000.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/1089_134686_000024_000004.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/1320_122612_000044_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/1320_122612_000049_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/3575_170457_000012_000002.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/4446_2273_000043_000001.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/5142_33396_000022_000003.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/6829_68771_000035_000000.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/7176_92135_000022_000022.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_freeu/7729_102255_000003_000004.wav"></audio></td>
+        </tr>
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (step 16)</b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/libri/periodwave_mb/1089_134686_000009_000000.wav""></audio></td>
@@ -169,7 +181,7 @@
             Although GAN-based models have shown their powerful generative performance for the original Mel-spectrogram converted from GT audio, these results show that they have low robustness for the generated Mel-spectrogram from the TTS models. We used the official implementation and checkpoints of BigVGAN and BigVSAN.  
         </p>
         <figure style="text-align: left;">
-            <img src="samples/tts_24k/table_eval_zeroshot_tts.jpg" alt="evaluation table" width="20%" height="auto"> 
+            <img src="samples/tts_24k/table_eval_zeroshot_tts.jpg" alt="evaluation table" width="40%" height="auto"> 
             <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
                 UTMOS results for zero-shot TTS (500 samples).
             </figcaption>
@@ -179,7 +191,7 @@
         <table>
         <tbody>
 
-
+<!-- 
             <tr>
                 <td nowrap width="160">BigVGAN-base</td> 
                 <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/121_121726_000025_000001.wav"></audio></td> 
@@ -193,22 +205,8 @@
                 <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/7729_102255_000018_000006.wav"></audio></td> 
                 <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/8555_284449_000029_000001.wav"></audio></td> 
 
-            </tr>
+            </tr> -->
     
-            <tr>
-                <td nowrap width="160">BigVGAN</td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/121_121726_000025_000001.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/672_122797_000002_000002.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/1089_134691_000054_000000.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/1320_122612_000002_000000.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/3570_5694_000014_000019.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/4077_13751_000019_000003.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/4446_2271_000001_000006.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/5105_28241_000019_000004.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/7729_102255_000018_000006.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/8555_284449_000029_000001.wav"></audio></td> 
- 
-            </tr>
 
             <tr>
                 <td nowrap width="160">BigVSAN</td> 
@@ -224,6 +222,21 @@
                 <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvsan_large/8555_284449_000029_000001.wav"></audio></td> 
 
             </tr>
+            
+            <tr>
+                <td nowrap width="160">BigVGAN</td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/121_121726_000025_000001.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/672_122797_000002_000002.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/1089_134691_000054_000000.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/1320_122612_000002_000000.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/3570_5694_000014_000019.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/4077_13751_000019_000003.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/4446_2271_000001_000006.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/5105_28241_000019_000004.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/7729_102255_000018_000006.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_large/8555_284449_000029_000001.wav"></audio></td> 
+ 
+            </tr>
             <tr>
                 <td nowrap width="160"><b>PeriodWave (step 16)</b></td> 
                 <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/121_121726_000025_000001.wav"></audio></td> 
@@ -238,6 +251,20 @@
                 <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/8555_284449_000029_000001.wav"></audio></td> 
    
             </tr>
+            <tr>
+                <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/121_121726_000025_000001.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/672_122797_000002_000002.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/1089_134691_000054_000000.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/1320_122612_000002_000000.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/3570_5694_000014_000019.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/4077_13751_000019_000003.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/4446_2271_000001_000006.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/5105_28241_000019_000004.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/7729_102255_000018_000006.wav"></audio></td> 
+                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/8555_284449_000029_000001.wav"></audio></td> 
+   
+            </tr>
     
         </tbody>
         </table>
@@ -245,7 +272,7 @@
         <br><br> 
 
         <div>
-            <a name="tts_24k_steps"><h2> Zero-shot TTS according to Sampling Steps (<a href="https://arxiv.org/abs/2406.05551">ARDiT-TTS</a> + PeriodWave / 24,000 Hz) </h2></a>
+            <a name="tts_24k_steps"><h2> Zero-shot TTS according to Sampling Steps (<a href="https://arxiv.org/abs/2406.05551">ARDiT-TTS</a> + PeriodWave(FreeU) / 24,000 Hz) </h2></a>
             <figure style="text-align: left;">
                 <img src="samples/tts_24k/table_eval_zeroshot_tts2.jpg" alt="evaluation table" width="20%" height="auto"> 
                 <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
@@ -312,16 +339,16 @@
                 </tr>
                 <tr>
                     <td nowrap width="160"><b>PeriodWave (step 16)</b></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/121_121726_000025_000001.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/672_122797_000002_000002.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/1089_134691_000054_000000.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/1320_122612_000002_000000.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/3570_5694_000014_000019.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/4077_13751_000019_000003.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/4446_2271_000001_000006.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/5105_28241_000019_000004.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/7729_102255_000018_000006.wav"></audio></td> 
-                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave/8555_284449_000029_000001.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/121_121726_000025_000001.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/672_122797_000002_000002.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/1089_134691_000054_000000.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/1320_122612_000002_000000.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/3570_5694_000014_000019.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/4077_13751_000019_000003.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/4446_2271_000001_000006.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/5105_28241_000019_000004.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/7729_102255_000018_000006.wav"></audio></td> 
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/periodwave_16/8555_284449_000029_000001.wav"></audio></td> 
        
                 </tr>
             </tbody>
@@ -430,7 +457,19 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ050-0274.wav"></audio></td>
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave/LJ050-0277.wav"></audio></td>
         </tr> 
-
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ019-0178.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ022-0046.wav""></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ032-0198.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ038-0212.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ039-0149.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ044-0109.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ050-0271.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ050-0272.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ050-0274.wav"></audio></td>
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_freeu/LJ050-0277.wav"></audio></td>
+        </tr> 
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (step 16)</b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/LJSpeech/periodwave_mb/LJ019-0178.wav""></audio></td>
@@ -453,6 +492,12 @@
     <div>
     <a name="tts"><h2>LJSpeech TTS (Glow TTS + Vocoder / 22,050 Hz) </h2></a>
     <hr>
+    <figure style="text-align: left;">
+        <img src="samples/tts/ljspeech_tts.JPG" alt="evaluation table" width="40%" height="auto"> 
+        <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
+
+        </figcaption>
+    </figure> 
     <table>
     <tbody>
         <tr>
@@ -517,7 +562,14 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave/LJ046-0193.wav"></audio></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave/LJ049-0031.wav"></audio></td> 
         </tr> 
-
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU(step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_freeu/LJ006-0078.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_freeu/LJ008-0140.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_freeu/LJ008-0158.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_freeu/LJ046-0193.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_freeu/LJ049-0031.wav"></audio></td> 
+        </tr> 
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (𝜏 = 0.333) </b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts/periodwave_mb_333/LJ006-0078.wav"></audio></td> 
@@ -554,7 +606,7 @@
         <a name="pw_step"><h2>LJSpeech (per sampling step) </h2></a>
         <hr>  
         <figure style="text-align: left;">
-            <img src="samples/pw_step/table_eval.jpg" alt="evaluation table" width="65%" height="auto"> 
+            <img src="samples/pw_step/table_eval.jpg" alt="evaluation table" width="40%" height="auto"> 
             <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
                 Objective evaluation results on LJSpeech according to different sampling steps. We utilized PeriodWave trained for 1M steps.
             </figcaption>
@@ -704,7 +756,15 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_bass.wav"></audio></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_bass.wav"></audio></td>  
         </tr>
-
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Georgia Wonder - Siren_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Lyndsey Ollard - Catching Up_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/M.E.R.C. Music - Knockout_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Sambasevam Shanmugam - Kaathaadi_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Speak Softly - Broken Man_bass.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Tom McKenzie - Directions_bass.wav"></audio></td>  
+        </tr>
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (step 16)</b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_bass.wav"></audio></td> 
@@ -783,7 +843,15 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_drums.wav"></audio></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_drums.wav"></audio></td>  
         </tr>
-
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Georgia Wonder - Siren_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Lyndsey Ollard - Catching Up_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/M.E.R.C. Music - Knockout_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Sambasevam Shanmugam - Kaathaadi_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Speak Softly - Broken Man_drums.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Tom McKenzie - Directions_drums.wav"></audio></td>  
+        </tr>
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (step 16)</b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_drums.wav"></audio></td> 
@@ -862,7 +930,15 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_mixture.wav"></audio></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_mixture.wav"></audio></td>  
         </tr>
-
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Georgia Wonder - Siren_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Lyndsey Ollard - Catching Up_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/M.E.R.C. Music - Knockout_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Sambasevam Shanmugam - Kaathaadi_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Speak Softly - Broken Man_mixture.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Tom McKenzie - Directions_mixture.wav"></audio></td>  
+        </tr>
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (step 16)</b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_mixture.wav"></audio></td> 
@@ -941,7 +1017,15 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_other.wav"></audio></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_other.wav"></audio></td>  
         </tr>
-    
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Georgia Wonder - Siren_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Lyndsey Ollard - Catching Up_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/M.E.R.C. Music - Knockout_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Sambasevam Shanmugam - Kaathaadi_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Speak Softly - Broken Man_other.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Tom McKenzie - Directions_other.wav"></audio></td>  
+        </tr>  
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (step 16)</b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_other.wav"></audio></td> 
@@ -1020,7 +1104,15 @@
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Speak Softly - Broken Man_vocals.wav"></audio></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave/Tom McKenzie - Directions_vocals.wav"></audio></td>  
         </tr>
-    
+        <tr>
+            <td nowrap width="160"><b>PeriodWave + FreeU (step 16)</b></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Georgia Wonder - Siren_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Lyndsey Ollard - Catching Up_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/M.E.R.C. Music - Knockout_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Sambasevam Shanmugam - Kaathaadi_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Speak Softly - Broken Man_vocals.wav"></audio></td> 
+            <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_freeu/Tom McKenzie - Directions_vocals.wav"></audio></td>  
+        </tr>
         <tr>
             <td nowrap width="160"><b>MB-PeriodWave (step 16)</b></td> 
             <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/ood/periodwave_mb/Georgia Wonder - Siren_vocals.wav"></audio></td> 

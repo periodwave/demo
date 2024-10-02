@@ -21,17 +21,17 @@
     <div>
     <h3>Abstract</h3> 
     <p> Recently, universal waveform generation tasks have been investigated conditioned on various out-of-distribution scenarios. 
-        Although GAN-based methods have shown their strength in fast waveform generation, they are vulnerable to train-inference mismatch scenarios such as two-stage text-to-speech. 
-        Meanwhile, diffusion-based models have shown their powerful generative performance in other domains; 
-        however, they stay out of the limelight due to slow inference speed in waveform generation tasks. 
+        Although one-step GAN-based methods have shown their strength in fast waveform generation, they are vulnerable to train-inference mismatch scenarios such as two-stage text-to-speech. 
+        Meanwhile, diffusion-based models have shown their powerful generative performance in other domains; however, they stay out of the limelight due to slow inference speed in waveform generation tasks. 
         Above all, there is no generator architecture that can explicitly disentangle the natural periodic features of high-resolution waveform signals. 
-        In this paper, we propose PeriodWave, a novel universal waveform generation model. 
-        First, we introduce a period-aware flow matching estimator that can capture the periodic features of the waveform signal when estimating the vector fields. 
+        In this paper, we propose \textit{PeriodWave}, a novel universal waveform generation model from Mel-spectrogram and neural audio codec. 
+        First, we introduce a period-aware flow matching estimator that effectively captures the periodic features of the waveform signal when estimating the vector fields. 
         Additionally, we utilize a multi-period estimator that avoids overlaps to capture different periodic features of waveform signals. 
         Although increasing the number of periods can improve the performance significantly, this requires more computational costs. 
         To reduce this issue, we also propose a single period-conditional universal estimator that can feed-forward parallel by period-wise batch inference. 
-        Additionally, we utilize discrete wavelet transform to losslessly disentangle the frequency information of waveform signals for high-frequency modeling. 
-        The experimental results demonstrated that our model outperforms the previous models both in Mel-spectrogram reconstruction and text-to-speech tasks. 
+        Additionally, we first introduce FreeU to reduce the high-frequency noise for waveform generation. 
+        Furthermore, we demonstrate the effectiveness of the proposed method in neural audio codec decoding task, and present the streaming generation framework of non-autoregressive model for speech language models. 
+        The experimental results demonstrated that our model outperforms the previous models in reconstruction tasks from Mel-spectrogram and discrete token, and text-to-speech tasks.
     </p>
     </div> 
  
@@ -41,6 +41,7 @@
         <li><a href="#ms">Multi Speakers (LibriTTS Dataset)</a></li>
         <li><a href="#tts_24k"> Zero-shot TTS (ARDiT-TTS + Vocoder / 24,000 Hz) </a></li>
         <li><a href="#tts_24k_steps"> Zero-shot TTS according to Sampling Steps </a></li>
+        <li><a href="#codec"> Neural Audio Codec Decoding from discrete tokens</a></li>
         <li><a href="#ss">Single Speaker (LJSpeech Dataset) </a></li>
         <li><a href="#tts">LJSpeech TTS (Glow TTS + Vocoder / 22,050 Hz) </a></li>
         <li><a href="#pw_step">LJSpeech (per sampling step) </a></li>
@@ -175,39 +176,20 @@
 
     <div>
         <a name="tts_24k"><h2> Zero-shot TTS (<a href="https://arxiv.org/abs/2406.05551">ARDiT-TTS</a> + Vocoder / 24,000 Hz) </h2></a>
+        <hr>
         <p> To further demonstrate the effectiveness of our model for two-stage TTS, we added the results for multi-speaker zero-shot TTS. We utilized an autoregressive diffusion transformer-based zero-shot TTS model, <a href="https://arxiv.org/abs/2406.05551">ARDiT-TTS</a> for TTS model which used the same configuration of Mel-spectrogram for 24 kHz audio. 
             We requested the generated Mel-spectrogram of ARDiT-TTS from the authors and they kindly sent us the Mel-spectrogram of 500 samples for the LibriTTS-test-subsets. 
             We have attached the UTMOS results for each vocoder, and we will conduct the MOS for this experiment.
             Although GAN-based models have shown their powerful generative performance for the original Mel-spectrogram converted from GT audio, these results show that they have low robustness for the generated Mel-spectrogram from the TTS models. We used the official implementation and checkpoints of BigVGAN and BigVSAN.  
-        </p>
+        </p> 
         <figure style="text-align: left;">
             <img src="samples/tts_24k/table_eval_zeroshot_tts.JPG" alt="evaluation table" width="40%" height="auto"> 
             <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
                 UTMOS results for zero-shot TTS (500 samples).
             </figcaption>
-        </figure> 
-       
-        <hr>
+        </figure>  
         <table>
-        <tbody>
-
-<!-- 
-            <tr>
-                <td nowrap width="160">BigVGAN-base</td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/121_121726_000025_000001.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/672_122797_000002_000002.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/1089_134691_000054_000000.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/1320_122612_000002_000000.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/3570_5694_000014_000019.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/4077_13751_000019_000003.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/4446_2271_000001_000006.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/5105_28241_000019_000004.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/7729_102255_000018_000006.wav"></audio></td> 
-                <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvgan_base/8555_284449_000029_000001.wav"></audio></td> 
-
-            </tr> -->
-    
-
+        <tbody> 
             <tr>
                 <td nowrap width="160">BigVSAN</td> 
                 <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/tts_24k/bigvsan_large/121_121726_000025_000001.wav"></audio></td> 
@@ -273,6 +255,8 @@
 
         <div>
             <a name="tts_24k_steps"><h2> Zero-shot TTS according to Sampling Steps (<a href="https://arxiv.org/abs/2406.05551">ARDiT-TTS</a> + PeriodWave(FreeU) / 24,000 Hz) </h2></a>
+
+            <hr>
             <figure style="text-align: left;">
                 <img src="samples/tts_24k/table_eval_zeroshot_tts2.JPG" alt="evaluation table" width="20%" height="auto"> 
                 <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
@@ -280,7 +264,6 @@
                 </figcaption>
             </figure> 
            
-            <hr>
             <table>
             <tbody>
                 <tr>
@@ -355,6 +338,153 @@
             </table>
             </div>  
             <br><br> 
+ 
+            
+            <a name="codec"><h2>Neural Audio Codec Decoding from discrete tokens</h2></a>
+            <hr>
+            <figure style="text-align: left;">
+                <img src="samples/mimi/nac_ps_1.jpg" alt="evaluation table" width="40%" height="auto"> 
+                <figcaption style="text-align: left; margin-top: 10px; font-style: italic;">
+        
+                </figcaption>
+            </figure> 
+            <p> We conducted experiments for parallel and streaming generation from discrete tokens. We used <a href="https://github.com/kyutai-labs/moshi/tree/main">Mimi of Moshi</a>, a state-of-the-art neural audio codec that operates at 12.5 Hz. 
+                Note that the number of codebooks in Mimi can be up to 32, but Moshi utilized a Q=8 quantizer for speech language models, so we also used the same discrete tokens from the eight quantizer as an input to our model instead of Mel-spectrogram. 
+            </p>
+            <h3>   Parallel Generation </h3>
+            <hr>
+            <table>
+            <tbody>
+                <tr>
+                    <td nowrap width="160">Ground Truth</td>  
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/1585_131718_000025_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/1988_147956_000016_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/2035_147960_000019_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/2412_153954_000004_000005.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/3915_57461_000018_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/5694_64025_000004_000006.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/6267_53049_000007_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/7850_286674_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/8173_294714_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/8297_275156_000013_000005.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td nowrap width="160">Mimi (Q=32)</td>  
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/1585_131718_000025_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/1988_147956_000016_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/2035_147960_000019_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/2412_153954_000004_000005.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/3915_57461_000018_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/5694_64025_000004_000006.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/6267_53049_000007_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/7850_286674_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/8173_294714_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook32/8297_275156_000013_000005.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td nowrap width="160">Mimi (Q=16)</td>  
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/1585_131718_000025_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/1988_147956_000016_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/2035_147960_000019_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/2412_153954_000004_000005.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/3915_57461_000018_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/5694_64025_000004_000006.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/6267_53049_000007_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/7850_286674_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/8173_294714_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook16/8297_275156_000013_000005.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td nowrap width="160">Mimi (Q=8)</td>  
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/1585_131718_000025_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/1988_147956_000016_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/2035_147960_000019_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/2412_153954_000004_000005.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/3915_57461_000018_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/5694_64025_000004_000006.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/6267_53049_000007_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/7850_286674_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/8173_294714_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_parallel/8297_275156_000013_000005.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td nowrap width="160">PeriodWave (Q=8, 2 steps)</td>  
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/1585_131718_000025_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/1988_147956_000016_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/2035_147960_000019_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/2412_153954_000004_000005.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/3915_57461_000018_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/5694_64025_000004_000006.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/6267_53049_000007_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/7850_286674_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/8173_294714_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_2_stftd_50k_euler_2_1/8297_275156_000013_000005.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td nowrap width="160">PeriodWave (Q=8, 4 steps)</td>  
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/1585_131718_000025_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/1988_147956_000016_000009.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/2035_147960_000019_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/2412_153954_000004_000005.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/3915_57461_000018_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/5694_64025_000004_000006.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/6267_53049_000007_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/7850_286674_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/8173_294714_000006_000001.wav"></audio></td>
+                    <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo_4_msstft_50k_euler_4_1/8297_275156_000013_000005.wav"></audio></td>
+                </tr>
+            </tbody>
+            </table>
+       
+            <br><br> 
+                <h3> Streaming Generation </h3>
+                <hr>
+                <table>
+                <tbody>
+                    <tr>
+                        <td nowrap width="160">Ground Truth</td>  
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/1585_131718_000025_000009.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/1988_147956_000016_000009.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/2035_147960_000019_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/2412_153954_000004_000005.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/3915_57461_000018_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/5694_64025_000004_000006.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/6267_53049_000007_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/7850_286674_000006_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/8173_294714_000006_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/libritts_dev_gt_mimi_padding/8297_275156_000013_000005.wav"></audio></td>
+                    </tr>
+                    <tr>
+                        <td nowrap width="160">Mimi (Q=8)</td>  
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/1585_131718_000025_000009.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/1988_147956_000016_000009.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/2035_147960_000019_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/2412_153954_000004_000005.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/3915_57461_000018_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/5694_64025_000004_000006.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/6267_53049_000007_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/7850_286674_000006_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/8173_294714_000006_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_codebook8_streaming/8297_275156_000013_000005.wav"></audio></td>
+                    </tr>
+                   <tr>
+                        <td nowrap width="160">PeriodWave (Q=8, 2 steps)</td>  
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/1585_131718_000025_000009.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/1988_147956_000016_000009.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/2035_147960_000019_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/2412_153954_000004_000005.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/3915_57461_000018_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/5694_64025_000004_000006.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/6267_53049_000007_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/7850_286674_000006_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/8173_294714_000006_000001.wav"></audio></td>
+                        <td><audio controls="" preload="none" controlslist="nodownload"><source src="samples/mimi/mimi_periodwave_turbo2_mstft_50k_streaming_euler_2_1_25_1/8297_275156_000013_000005.wav"></audio></td>
+                    </tr>
+          
+                </tbody>
+                </table> 
+                <br><br> 
+                
     <div>
     <a name="ss"><h2>Single Speaker (LJSpeech Dataset)</h2></a>
     <hr>
